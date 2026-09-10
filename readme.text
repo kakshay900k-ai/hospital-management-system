@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>CarePlus Hospital Management System</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="loginPage" class="login-page">
+    <div class="login-card">
+      <div class="brand-logo">✚</div>
+      <h1>CarePlus Hospital</h1>
+      <p>Hospital Management System</p>
+      <form id="loginForm">
+        <input id="username" placeholder="Username" value="admin" required>
+        <input id="password" type="password" placeholder="Password" value="admin123" required>
+        <button class="primary" type="submit">Login</button>
+      </form>
+      <small>Demo login: admin / admin123</small>
+    </div>
+  </div>
+
+  <div id="app" class="app hidden">
+    <aside class="sidebar">
+      <div class="side-brand"><span>✚</span> CarePlus</div>
+      <nav>
+        <button class="nav active" data-page="dashboard">🏠 Dashboard</button>
+        <button class="nav" data-page="patients">🧑‍⚕️ Patients</button>
+        <button class="nav" data-page="doctors">👨‍⚕️ Doctors</button>
+        <button class="nav" data-page="appointments">📅 Appointments</button>
+        <button class="nav" data-page="billing">💳 Billing</button>
+        <button class="nav" data-page="ai">🤖 AI Assistant</button>
+      </nav>
+      <button id="logoutBtn" class="logout">↪ Logout</button>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h2 id="pageTitle">Dashboard</h2>
+          <span id="today"></span>
+        </div>
+        <div class="admin">👤 Admin</div>
+      </header>
+
+      <section id="dashboard" class="page">
+        <div class="hero">
+          <div><h1>Welcome to CarePlus</h1><p>Manage your hospital from one simple dashboard.</p></div>
+          <button class="primary" onclick="showPage('appointments')">+ New Appointment</button>
+        </div>
+        <div class="cards">
+          <div class="stat"><span>Patients</span><b id="patientCount">0</b></div>
+          <div class="stat"><span>Doctors</span><b id="doctorCount">0</b></div>
+          <div class="stat"><span>Appointments</span><b id="appointmentCount">0</b></div>
+          <div class="stat"><span>Revenue</span><b id="revenue">₹0</b></div>
+        </div>
+        <div class="grid2">
+          <div class="panel"><h3>Recent Patients</h3><div id="recentPatients"></div></div>
+          <div class="panel"><h3>Today's Appointments</h3><div id="todayAppointments"></div></div>
+        </div>
+      </section>
+
+      <section id="patients" class="page hidden">
+        <div class="section-head"><h2>Patient Management</h2><button class="primary" onclick="openModal('patientModal')">+ Add Patient</button></div>
+        <input class="search" id="patientSearch" placeholder="Search patients..." oninput="renderPatients()">
+        <div class="panel table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Age</th><th>Gender</th><th>Phone</th><th>Action</th></tr></thead><tbody id="patientTable"></tbody></table></div>
+      </section>
+
+      <section id="doctors" class="page hidden">
+        <div class="section-head"><h2>Doctor Management</h2><button class="primary" onclick="openModal('doctorModal')">+ Add Doctor</button></div>
+        <div class="doctor-grid" id="doctorGrid"></div>
+      </section>
+
+      <section id="appointments" class="page hidden">
+        <div class="section-head"><h2>Appointments</h2><button class="primary" onclick="openModal('appointmentModal')">+ New Appointment</button></div>
+        <div class="panel table-wrap"><table><thead><tr><th>Patient</th><th>Doctor</th><th>Date</th><th>Time</th><th>Status</th><th>Action</th></tr></thead><tbody id="appointmentTable"></tbody></table></div>
+      </section>
+
+      <section id="billing" class="page hidden">
+        <div class="section-head"><h2>Billing</h2><button class="primary" onclick="openModal('billModal')">+ Create Bill</button></div>
+        <div class="panel table-wrap"><table><thead><tr><th>Bill ID</th><th>Patient</th><th>Service</th><th>Amount</th><th>Date</th><th>Action</th></tr></thead><tbody id="billTable"></tbody></table></div>
+      </section>
+
+      <section id="ai" class="page hidden">
+        <div class="ai-box">
+          <div class="ai-head"><span>🤖</span><div><h2>CarePlus AI Assistant</h2><p>Demo hospital assistant — helps with basic system queries.</p></div></div>
+          <div id="chat" class="chat"></div>
+          <div class="chat-input"><input id="aiInput" placeholder="Ask: how many patients, appointments, revenue..."><button class="primary" onclick="askAI()">Send</button></div>
+          <p class="notice">For real AI (OpenAI/Gemini), connect a secure backend API. Never put a private API key directly in this HTML/JS file.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Patient Modal -->
+  <div id="patientModal" class="modal"><div class="modal-card"><button class="close" onclick="closeModal('patientModal')">×</button><h2>Add Patient</h2>
+    <form id="patientForm"><input id="pName" placeholder="Full name" required><input id="pAge" type="number" placeholder="Age" required>
+    <select id="pGender" required><option value="">Gender</option><option>Male</option><option>Female</option><option>Other</option></select>
+    <input id="pPhone" placeholder="Phone" required><input id="pDisease" placeholder="Disease / Problem">
+    <button class="primary">Save Patient</button></form>
+  </div></div>
+
+  <!-- Doctor Modal -->
+  <div id="doctorModal" class="modal"><div class="modal-card"><button class="close" onclick="closeModal('doctorModal')">×</button><h2>Add Doctor</h2>
+    <form id="doctorForm"><input id="dName" placeholder="Doctor name" required><input id="dSpeciality" placeholder="Specialization" required>
+    <input id="dPhone" placeholder="Phone"><button class="primary">Save Doctor</button></form>
+  </div></div>
+
+  <!-- Appointment Modal -->
+  <div id="appointmentModal" class="modal"><div class="modal-card"><button class="close" onclick="closeModal('appointmentModal')">×</button><h2>New Appointment</h2>
+    <form id="appointmentForm"><select id="aPatient" required></select><select id="aDoctor" required></select>
+    <input id="aDate" type="date" required><input id="aTime" type="time" required>
+    <button class="primary">Book Appointment</button></form>
+  </div></div>
+
+  <!-- Bill Modal -->
+  <div id="billModal" class="modal"><div class="modal-card"><button class="close" onclick="closeModal('billModal')">×</button><h2>Create Bill</h2>
+    <form id="billForm"><select id="bPatient" required></select><input id="bService" placeholder="Service" required>
+    <input id="bAmount" type="number" placeholder="Amount ₹" required><button class="primary">Create Bill</button></form>
+  </div></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
